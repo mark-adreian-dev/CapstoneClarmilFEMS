@@ -1,24 +1,73 @@
-import { useEffect } from "react"
-import { api } from "./utils/api"
+import { Navigate, Route, Routes } from "react-router-dom"
+import LoginPage from "./pages/LoginPage"
+import { UserContextRole, UserRole } from "./types/User"
+import { useContext, type ReactNode } from "react"
+import { AuthContext } from "./context/AuthContext/AuthContext"
+import MeasuringWorkerLayout from "./layout/MeasuringWorkerLayout"
+import LoadingPage from "./pages/LoadingPage"
+import ProcessingWorkerLayout from "./layout/ProcessingWorkerLayout"
+import ManagerLayout from "./layout/ManagerLayout"
+import SystemAdminLayout from "./layout/SystemAdminLayout"
+
 
 function App() {
-
-  const sendRequest = async () => {
-    const response = await api.get("")
-    const data = response.data
-
-    console.log(data)
-  }
-
-  useEffect(() => {
-    sendRequest()
-  }, [])
-
   return (
-    <>
-      Hello World
-    </>
+   
+      <Routes>
+        <Route path="/" element={<Navigate to={"/login/worker"} />} />
+
+        <Route path="/login/worker" element={<LoginPage context={UserContextRole.WORKER} />} />
+        <Route path="/login/manager" element={<LoginPage context={UserContextRole.MANAGER} />} />
+        <Route path="/login/admin" element={<LoginPage context={UserContextRole.ADMIN} />} />
+
+        <Route
+          path="/worker"
+          element={
+            <ProtectedRoute allowedRole={UserRole.MEASURING}>
+              <MeasuringWorkerLayout />
+            </ProtectedRoute>
+          }
+        >
+        </Route>
+        <Route
+          path="/worker/reciever"
+          element={
+            <ProtectedRoute allowedRole={UserRole.RECIEVER}>
+              <ProcessingWorkerLayout />
+            </ProtectedRoute>
+          }
+        >
+        </Route>
+        <Route
+          path="/manager"
+          element={
+            <ProtectedRoute allowedRole={UserRole.MANAGER}>
+              <ManagerLayout />
+            </ProtectedRoute>
+          }
+        >
+        </Route>
+        <Route
+          path="/admin"
+          element={
+            <ProtectedRoute allowedRole={UserRole.ADMIN}>
+              <SystemAdminLayout />
+            </ProtectedRoute>
+          }
+        >
+        </Route>
+        <Route path="*" element={<Navigate to={"/"} />} />
+      </Routes>
   )
+}
+
+const ProtectedRoute = ({ children, allowedRole }: { children: ReactNode, allowedRole: UserRole}) => {
+  const { authLoading, isAuthenticated, user, role } = useContext(AuthContext)
+  
+  if (authLoading) return <LoadingPage />
+  else if (!isAuthenticated || !user || !role) return <>Protected</>
+  else if (user.role !== allowedRole) return <>Invalid Role</>
+  else return <>{children}</>
 }
 
 export default App

@@ -13,11 +13,3 @@ export const api = axios.create({
     "Content-Type": "application/json",
   }
 })
-
-export const setAuthorization = (token: string) => {
-  api.defaults.headers.common.Authorization = token
-} 
-
-export const clearAuthorization = () => {
-  api.defaults.headers.common.Authorization = ""
-} 
