@@ -22,8 +22,9 @@ class LoginRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'email' => 'required|email',
-            'password' => 'required|string'
+            'employee_id' => 'required|string',
+            'password' => 'required|string',
+            'context' => 'required|in:worker,manager,admin'
         ];
     }
 }

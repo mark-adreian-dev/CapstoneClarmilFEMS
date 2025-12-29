@@ -11,13 +11,33 @@ class AuthController extends Controller
 {
     public function login(LoginRequest $request)
     {
-        $credentials = $request->validated();
+        $credentials = $request->only('employee_id', 'password');
 
-        if (Auth::attempt($credentials)) {
-            $request->session()->regenerate();
-            return response()->json(['message' => 'Login successful']);
+        if (!Auth::attempt($credentials)) {
+            return response()->json(['message' => 'Invalid credentials'], 401);
         }
-        return response()->json(['message' => 'Invalid credentials'], 401);
+
+        $request->session()->regenerate();
+
+        $user = auth()->user();
+
+        $contextRoleMap = [
+            'worker' => ['measuring_worker', 'receiving_worker'],
+            'manager' => ['manager'],
+            'admin' => ['admin'],
+        ];
+
+        if (!in_array($user->role, $contextRoleMap[$request->context])) {
+            Auth::logout();
+            return response()->json([
+                'message' => 'Invalid Credentials'
+            ], 403);
+        }
+
+        return response()->json([
+            'message' => 'Login successful',
+            'role' => $user->role,
+        ]);
     }
 
     public function logout(Request $request)
