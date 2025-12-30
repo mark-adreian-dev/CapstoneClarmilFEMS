@@ -12,11 +12,19 @@ class User extends Authenticatable
 
     protected $fillable = [
         'employee_id',
-        'name',
+        'first_name',
+        'last_name',
+        'middle_name',
+        'suffix',
         'email',
         'password',
         'role',
-        'department_id'
+        'address',
+        'contact_number',
+        'sex',
+        'department_id',
+        'plain_password',
+        'birthdate'
     ];
 
     protected $hidden = ['password'];
@@ -36,9 +44,15 @@ class User extends Authenticatable
         return $this->hasMany(Barcode::class, 'verified_by');
     }
 
-    public function department()
+    public function station()
     {
-        return $this->belongsTo(Department::class);
+        return $this->belongsTo(Station::class);
+    }
+
+    // Inside User.php
+    public function loadStation()
+    {
+        return $this->load('station');
     }
 }
 

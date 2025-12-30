@@ -2,11 +2,12 @@
 namespace Database\Factories;
 
 use App\Models\Department;
+use App\Models\Station;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
-class DepartmentFactory extends Factory
+class StationFactory extends Factory
 {
-    protected $model = Department::class;
+    protected $model = Station::class;
 
     public function definition()
     {
@@ -15,7 +16,7 @@ class DepartmentFactory extends Factory
                 'Measuring Room',
                 'Receiving Department',
                 'Quality Control',
-                'Administration'
+                'Management'
             ]),
             'description' => $this->faker->sentence,
         ];

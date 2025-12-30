@@ -3,13 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Models\Department;
+use App\Models\Station;
 use Illuminate\Http\Request;
 
-class DepartmentController extends Controller
+class StationController extends Controller
 {
     public function index()
     {
-        return Department::with('users')->get();
+        return Station::with('users')->get();
     }
 
     public function store(Request $request)
@@ -19,16 +20,16 @@ class DepartmentController extends Controller
             'description' => 'nullable|string',
         ]);
 
-        $department = Department::create($validated);
+        $department = Station::create($validated);
         return response()->json($department, 201);
     }
 
-    public function show(Department $department)
+    public function show(Station $department)
     {
         return $department->load('users');
     }
 
-    public function update(Request $request, Department $department)
+    public function update(Request $request, Station $department)
     {
         $validated = $request->validate([
             'name' => 'sometimes|required|string|unique:departments,name,' . $department->id,
@@ -39,7 +40,7 @@ class DepartmentController extends Controller
         return response()->json($department);
     }
 
-    public function destroy(Department $department)
+    public function destroy(Station $department)
     {
         $department->delete();
         return response()->noContent();

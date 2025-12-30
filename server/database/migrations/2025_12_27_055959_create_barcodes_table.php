@@ -21,7 +21,7 @@ return new class extends Migration
             $table->foreignId('scanned_by')->nullable()->constrained('users')->onDelete('set null');
             $table->timestamp('verified_at')->nullable();
             $table->foreignId('verified_by')->nullable()->constrained('users')->onDelete('set null');
-            $table->foreignId('department_id')->nullable()->constrained('departments')->onDelete('set null');
+            $table->foreignId('station_id')->nullable()->constrained('stations')->onDelete('set null');
             $table->timestamps();
         });
     }

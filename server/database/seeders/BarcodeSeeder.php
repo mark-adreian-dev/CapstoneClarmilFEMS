@@ -5,16 +5,13 @@ namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 use App\Models\Barcode;
 use App\Models\Premix;
-use App\Models\Department;
-use App\Models\User;
+use App\Models\Station;
 
 class BarcodeSeeder extends Seeder
 {
     public function run(): void
     {
-        $measuringDept = Department::firstOrCreate(['name' => 'Measuring Room']);
-        $receivingDept = Department::firstOrCreate(['name' => 'Receiving Department']);
-
+        $measuring = Station::where('name', 'Measuring Room')->first();
         $premixes = Premix::all();
 
         if ($premixes->isEmpty()) {
@@ -24,7 +21,7 @@ class BarcodeSeeder extends Seeder
         foreach ($premixes as $premix) {
             Barcode::factory()->count(5)->create([
                 'premix_id' => $premix->id,
-                'department_id' => $measuringDept->id,
+                'station_id' => $measuring->id,
             ]);
         }
     }

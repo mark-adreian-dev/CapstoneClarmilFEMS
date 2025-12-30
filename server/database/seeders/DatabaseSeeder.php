@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Station;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -11,33 +12,15 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
+     
+
         // Seed users first (workers, managers, admins)
         $this->call([
+            StationSeeder::class,
             UserSeeder::class,
-        ]);
-
-        // Seed departments
-        $this->call([
-            DepartmentSeeder::class,
-        ]);
-
-        // Seed premixes
-        $this->call([
             PremixSeeder::class,
-        ]);
-
-        // // Seed barcodes
-        // $this->call([
-        //     BarcodeSeeder::class,
-        // ]);
-
-        // Seed work sessions
-        $this->call([
+        //  BarcodeSeeder::class,
             WorkSessionSeeder::class,
-        ]);
-
-        // Seed operation configs
-        $this->call([
             OperationConfigSeeder::class,
         ]);
     }
