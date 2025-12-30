@@ -11,6 +11,7 @@ import {
 
 import { IconSettings, IconHelp, IconSearch, IconDatabase, IconReport, IconFileWord, IconLayout } from "@tabler/icons-react"
 import type { AppSideBar } from "@/types/ComponentTypes/AppSideBar"
+import { Outlet } from "react-router-dom"
 
 
 const AppSideBarData: AppSideBar = {
@@ -73,7 +74,7 @@ export default function ProcessingWorkerLayout() {
         <div className="flex flex-1 flex-col">
           <div className="@container/main flex flex-1 flex-col gap-2">
             <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
-              <h1 className="text-6xl font-black" >Processing Staff Page</h1>
+              <Outlet />
               {/* <SectionCards />
               <div className="px-4 lg:px-6">
                 <ChartAreaInteractive />

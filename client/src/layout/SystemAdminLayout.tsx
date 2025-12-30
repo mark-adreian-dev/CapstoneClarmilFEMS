@@ -10,8 +10,9 @@ import {
   SidebarProvider,
 } from "@/components/ui/sidebar"
 
-import { IconSettings, IconHelp, IconSearch, IconDatabase, IconReport, IconFileWord, IconLayout, IconUserCircle, IconBuilding } from "@tabler/icons-react"
+import { IconSettings, IconHelp, IconSearch, IconDatabase, IconReport, IconFileWord, IconLayout, IconUserCircle, IconBuilding, IconPuzzle, IconFileBarcode } from "@tabler/icons-react"
 import type { AppSideBar } from "@/types/ComponentTypes/AppSideBar"
+import { Outlet } from "react-router-dom"
 
 
 const AppSideBarData: AppSideBar = {
@@ -22,14 +23,24 @@ const AppSideBarData: AppSideBar = {
       icon: IconLayout,
     },
     {
-      title: "Users",
+      title: "Employee Management",
       url: "/admin/users",
       icon: IconUserCircle,
     },
     {
-      title: "Departments",
-      url: "/admin/departments",
+      title: "Area Management",
+      url: "/admin/areas",
       icon: IconBuilding,
+    },
+    {
+      title: "Ingridients",
+      url: "/admin/ingridients",
+      icon: IconPuzzle,
+    },
+    {
+      title: "Report",
+      url: "/admin/report",
+      icon: IconFileBarcode,
     },
     
   ],
@@ -85,7 +96,7 @@ export default function SystemAdminLayout() {
         <div className="flex flex-1 flex-col">
           <div className="@container/main flex flex-1 flex-col gap-2">
             <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
-              <h1 className="text-6xl font-black" >Admin Page</h1>
+              <Outlet />
               {/* <SectionCards />
               <div className="px-4 lg:px-6">
                 <ChartAreaInteractive />

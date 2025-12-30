@@ -8,6 +8,10 @@ import LoadingPage from "./pages/LoadingPage"
 import ProcessingWorkerLayout from "./layout/ProcessingWorkerLayout"
 import ManagerLayout from "./layout/ManagerLayout"
 import SystemAdminLayout from "./layout/SystemAdminLayout"
+import AdminDashboardPage from "./pages/Admin/AdminDashboardPage"
+import AdminUsersPage from "./pages/Admin/AdminUsersPage"
+import AdminIngridientsPage from "./pages/Admin/AdminIngridientsPage"
+import AdminAreasPage from "./pages/Admin/AdminAreasPage"
 
 
 function App() {
@@ -55,6 +59,11 @@ function App() {
             </ProtectedRoute>
           }
         >
+          <Route index element={<AdminDashboardPage />}/>
+          <Route path="users" element={<AdminUsersPage />}/>
+          <Route path="areas" element={<AdminAreasPage />}/>
+          <Route path="ingridients" element={<AdminIngridientsPage />}/>
+          <Route path="report" element={<h1>Reports</h1>}/>
         </Route>
         <Route path="*" element={<Navigate to={"/"} />} />
       </Routes>

@@ -43,6 +43,7 @@ export const AuthState: React.FC<{ children: React.ReactNode }> = ({
     }
     reload()
   
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   const handleAuthRedirect = (role: UserRole) => {

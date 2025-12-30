@@ -1,7 +1,7 @@
-import { ChartAreaInteractive } from "@/components/chart-area-interactive"
-import { DataTable } from "@/components/data-table"
-import { SectionCards } from "@/components/section-cards"
-import data from "./data.json"
+// import { ChartAreaInteractive } from "@/components/chart-area-interactive"
+// import { DataTable } from "@/components/data-table"
+// import { SectionCards } from "@/components/section-cards"
+// import data from "./data.json"
 import { AppSidebar } from "@/components/app-sidebar"
 import { SiteHeader } from "@/components/site-header"
 import {
@@ -11,6 +11,7 @@ import {
 
 import { IconSettings, IconHelp, IconSearch, IconDatabase, IconReport, IconFileWord, IconLayout } from "@tabler/icons-react"
 import type { AppSideBar } from "@/types/ComponentTypes/AppSideBar"
+import { Outlet } from "react-router-dom"
 
 const AppSideBarData: AppSideBar = {
   navMain: [
@@ -72,12 +73,11 @@ export default function ManagerLayout() {
         <div className="flex flex-1 flex-col">
           <div className="@container/main flex flex-1 flex-col gap-2">
             <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
-              {/* <h1 className="text-6xl font-black" >Manager Page</h1> */}
-              <SectionCards />
-              <div className="px-4 lg:px-6">
+              <Outlet />
+              {/* <div className="px-4 lg:px-6">
                 <ChartAreaInteractive />
               </div>
-              <DataTable data={data} />
+              <DataTable data={data} /> */}
             </div>
           </div>
         </div>

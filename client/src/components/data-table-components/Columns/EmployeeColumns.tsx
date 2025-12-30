@@ -1,0 +1,190 @@
+import {  IconDotsVertical, IconGenderFemale, IconGenderMale, IconMail } from "@tabler/icons-react"
+import type { ColumnDef } from "@tanstack/react-table"
+import { Button } from "../../ui/button"
+import { Checkbox } from "../../ui/checkbox"
+import { Badge } from "../../ui/badge"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "../../ui/dropdown-menu"
+import DragHandle from "../ColumnComponents/DragHandle"
+import type { Employee } from "@/types/Employee"
+import { Sex, UserRole } from "@/types/User"
+import DeleteEmployeeDialog from "@/components/pages/Admin/EmployeeManagement/DeleteEmployeeDialog"
+import ShowPasswordDialog from "@/components/pages/Admin/EmployeeManagement/ShowPasswordDialog"
+import EditUserForm from "@/components/pages/Admin/EmployeeManagement/EditUserForm"
+
+
+export const employeeColumn: ColumnDef<Employee>[] = [
+  {
+    id: "drag",
+    header: () => null,
+    cell: ({ row }) => <DragHandle id={row.original.id} />,
+  },
+  {
+    id: "select",
+    header: ({ table }) => (
+      <div className="flex items-center justify-center">
+        <Checkbox
+          checked={
+            table.getIsAllPageRowsSelected() ||
+            (table.getIsSomePageRowsSelected() && "indeterminate")
+          }
+          onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+          aria-label="Select all"
+        />
+      </div>
+    ),
+    cell: ({ row }) => (
+      <div className="flex items-center justify-center">
+        <Checkbox
+          checked={row.getIsSelected()}
+          onCheckedChange={(value) => row.toggleSelected(!!value)}
+          aria-label="Select row"
+        />
+      </div>
+    ),
+    enableSorting: false,
+    enableHiding: true,
+    
+  },
+  {
+    accessorKey: "employee_id",
+    header: "Employee ID",
+    enableHiding: true,
+    cell: ({ row }) => (
+      <span>
+        {`#${row.original.employee_id}`}
+      </span>
+    )
+  },
+  {
+    accessorKey: "name",
+    header: "Fullname",
+    enableHiding: true,
+    cell: ({ row }) => (
+      <span>
+        {
+        `
+          ${row.original.suffix ?? ""} 
+          ${row.original.first_name} 
+          ${row.original.middle_name ? row.original.middle_name.split('')[0] + "." : ''}
+          ${row.original.last_name}
+        `
+        }
+      </span>
+    )
+   
+  },
+  {
+    accessorKey: "email",
+    header: "Email Address",
+    enableHiding: true,
+    cell: ({ row }) => (
+      <div className="w-fit">
+        <Badge variant="outline" className="text-muted-foreground px-1.5">
+          <IconMail />
+          {row.original.email}
+        </Badge>
+      </div>
+    ),
+  },
+
+  {
+    accessorKey: "sex",
+    header: "Sex",
+    enableHiding: true,
+    cell: ({ row }) => (
+      <div className="w-fit">
+        <p className="flex items-center gap-2">
+          {
+            row.original.sex === Sex.MALE ? <IconGenderMale className="text-blue-400" /> : <IconGenderFemale className="text-pink-400" />
+          }
+
+
+          {row.original.sex.toLocaleUpperCase()}
+        </p>
+      </div>
+    ),
+  },
+
+  {
+    accessorKey: "station.name",
+    header: "Station",
+    enableHiding: true,
+    cell: ({ row }) => (
+      <div className="w-fit">
+        <p className="flex items-center gap-2">
+         
+
+
+          {row.original.station ? row.original.station.name : "N/A"}
+        </p>
+      </div>
+    ),
+  },
+  {
+    accessorKey: "role",
+    header: "Role",
+    enableHiding: true,
+    cell: ({ row }) => {
+      const role = row.original.role
+      return <div className="w-32">
+        <Badge
+          variant="outline"
+          className={
+            `text-muted-foreground px-1.5 
+            ${role === UserRole.ADMIN && "text-violet-300 border border-violet-300"}
+            ${role === UserRole.MANAGER && "text-yellow-300 border border-yellow-300"}
+            ${role === UserRole.MEASURING && "text-green-300 border border-green-300"}
+            ${role === UserRole.RECIEVER && "text-blue-300 border border-blue-300"}
+            `
+          }
+        >
+          {
+            role === UserRole.ADMIN ? "Admin":
+            role === UserRole.MANAGER ? "Manager":
+            role === UserRole.MEASURING ? "Preparation":
+            role === UserRole.RECIEVER ? "Processing" : ""
+          }
+        </Badge>
+      </div>
+    }
+  },
+  {
+
+    header: "Actions",
+    enableHiding: true,
+    cell: ({ row }) => (
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button
+            variant="ghost"
+            className="data-[state=open]:bg-muted text-muted-foreground flex size-8"
+            size="icon"
+          >
+            <IconDotsVertical />
+            <span className="sr-only">Open menu</span>
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end" className="w-fit">
+          <DropdownMenuItem className="cursor-pointer" onSelect={(e) => {
+            e.preventDefault(); // Prevents the dropdown from closing immediately in a way that breaks the dialog focus
+          }}>
+            <EditUserForm targetID={row.original.id}/>
+          </DropdownMenuItem>
+          <DropdownMenuItem className="cursor-pointer" onClick={(e) => {
+            e.preventDefault()
+            e.stopPropagation()
+          }}>
+            <ShowPasswordDialog password={row.original.plain_password} />
+          </DropdownMenuItem>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem className="cursor-pointer p-0" onClick={(e) => {
+            e.preventDefault()
+            e.stopPropagation()
+          }}>
+            <DeleteEmployeeDialog id={row.original.id} />
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    ),
+  },
+]

@@ -32,6 +32,7 @@ export function NavUser({
 }) {
   const { isMobile } = useSidebar()
   const { logout } = useContext(AuthContext)
+  const fullName = `${user?.suffix ?? ""} ${user?.first_name} ${user?.middle_name?.split("")[0] ? user?.middle_name?.split("")[0] + "." : ""} ${user?.last_name ?? ""}`
 
   const handleLogout = async () => {
     await logout()
@@ -48,7 +49,7 @@ export function NavUser({
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
             >
               <Avatar className="h-8 w-8 rounded-lg grayscale">
-                <AvatarImage src={user.avatar} alt={user.name} />
+                  <AvatarImage src={user.avatar} alt={fullName} />
                 <AvatarFallback className="rounded-lg">CN</AvatarFallback>
               </Avatar>
              
@@ -63,11 +64,11 @@ export function NavUser({
             <DropdownMenuLabel className="p-0 font-normal">
               <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                 <Avatar className="h-8 w-8 rounded-lg">
-                  <AvatarImage src={user.avatar} alt={user.name} />
+                    <AvatarImage src={user.avatar} alt={fullName} />
                   <AvatarFallback className="rounded-lg">CN</AvatarFallback>
                 </Avatar>
                 <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-medium">{user.name}</span>
+                    <span className="truncate font-medium">{fullName}</span>
                   <span className="text-muted-foreground text-xs">
                     {user.email}
                   </span>
