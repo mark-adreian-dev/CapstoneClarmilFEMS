@@ -1,9 +1,10 @@
-import type { Employee } from "@/types/Employee";
+import type { Employee, EmployeeCategory } from "@/types/Employee";
 import type { EmployeeContextType } from "./EmployeeContext";
 
 export type EmployeeAction =
   | { type: 'SET_LOADING', payload: boolean }
   | { type: 'SET_ERROR', payload: string }
+  | { type: 'SET_ACTIVE_TAB', payload: EmployeeCategory }
   | { type: 'AUTH_STATUS_RESET' }
 
   | { type: 'SET_EMPLOYEES', payload: Employee[] }
@@ -18,6 +19,11 @@ export const EmployeeReducer = (state: EmployeeContextType, action: EmployeeActi
       return {
         ...state,
         isLoading: action.payload
+      }
+    case "SET_ACTIVE_TAB":
+      return {
+        ...state,
+        activeTab: action.payload
       }
     case "SET_ERROR":
       return {

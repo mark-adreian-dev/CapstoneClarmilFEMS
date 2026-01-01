@@ -7,28 +7,18 @@ export interface User {
   suffix?: string
   email: string
   birthdate: string | null
-  role: UserRole
+  role: UserRole | null
   sex: Sex
   address?: string
   contact_number?: string
   plain_password: string
-  created_at: string
-  updated_at: string
+  created_at: Date
+  updated_at: Date
 }
 
 
-//CRUD
-export interface UserFormType {
-  first_name: string;
-  last_name: string;
-  middle_name: string;
-  suffix: string;
-  sex: Sex; 
-  address: string;
-  contact_number: string;
-  role: UserRole | null; 
-  birthdate: string | null;
-  email: string;
+export type UserFormType = Omit<Partial<User>, 'birthdate'> & {
+  birthdate: Date | null;
 }
 
 export enum Sex {

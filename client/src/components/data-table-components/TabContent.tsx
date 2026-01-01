@@ -1,19 +1,19 @@
 import { DndContext, closestCenter, type DragEndEvent, type SensorDescriptor, type SensorOptions, type UniqueIdentifier } from "@dnd-kit/core"
-import { SortableContext, verticalListSortingStrategy, arrayMove } from "@dnd-kit/sortable"
+import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable"
 import { restrictToVerticalAxis } from "@dnd-kit/modifiers"
 import { Table, TableBody, TableCell, TableHeader, TableHead, TableRow } from "../ui/table"
 import { TabsContent } from "../ui/tabs"
 import { flexRender, type Table as TableAsProps } from "@tanstack/react-table"
-import type { Dispatch, SetStateAction } from "react"
+import { useContext } from "react"
 import { DraggableRow } from "./TabContentComponents/DraggableRow"
 import TableFooter from "./TableFooterComponents/TableFooter"
+import { EmployeeContext } from "@/context/EmployeeContext/EmployeeContext"
 
 interface TabContentProps<T extends { id: string | number }> {
   table: TableAsProps<T>
   sensors: SensorDescriptor<SensorOptions>[]
   sortableId: string
   tabValue: string
-  setData: Dispatch<SetStateAction<T[]>>
   dataIds: UniqueIdentifier[]
 }
 
@@ -21,25 +21,23 @@ export default function TabContent<T extends { id: string | number }>({
   table,
   sensors,
   sortableId,
-  setData,
   dataIds,
   tabValue
 }: TabContentProps<T>) {
 
+  const { reorderEmployees } = useContext(EmployeeContext)
   function handleDragEnd(event: DragEndEvent) {
     const { active, over } = event
     if (active && over && active.id !== over.id) {
-      setData((prev) => {
-        const oldIndex = dataIds.indexOf(active.id)
-        const newIndex = dataIds.indexOf(over.id)
-        return arrayMove(prev, oldIndex, newIndex)
-      })
+      const oldIndex = dataIds.indexOf(active.id)
+      const newIndex = dataIds.indexOf(over.id)
+      reorderEmployees(oldIndex, newIndex)
     }
   }
 
   return (
-    <TabsContent value={tabValue} className="relative flex flex-col gap-4 overflow-auto px-4 lg:px-6">
-      <div className="overflow-hidden rounded-lg border">
+    <TabsContent value={tabValue} className="relative flex flex-col h-full gap-4 overflow-auto px-4 lg:px-6">
+      <div className="overflow-hidden rounded-lg border h-full">
         <DndContext
           collisionDetection={closestCenter}
           modifiers={[restrictToVerticalAxis]}

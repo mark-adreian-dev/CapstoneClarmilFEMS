@@ -10,7 +10,7 @@ import {
   SidebarProvider,
 } from "@/components/ui/sidebar"
 
-import { IconSettings, IconHelp, IconSearch, IconDatabase, IconReport, IconFileWord, IconLayout, IconUserCircle, IconBuilding, IconPuzzle, IconFileBarcode } from "@tabler/icons-react"
+import { IconSettings, IconHelp, IconSearch, IconDatabase, IconReport, IconFileWord, IconLayout, IconUserCircle, IconBuilding, IconFileBarcode } from "@tabler/icons-react"
 import type { AppSideBar } from "@/types/ComponentTypes/AppSideBar"
 import { Outlet } from "react-router-dom"
 
@@ -22,20 +22,21 @@ const AppSideBarData: AppSideBar = {
       url: "/admin",
       icon: IconLayout,
     },
+    
     {
-      title: "Employee Management",
+      title: "Employees",
       url: "/admin/users",
       icon: IconUserCircle,
-    },
+    }, 
     {
-      title: "Area Management",
-      url: "/admin/areas",
-      icon: IconBuilding,
-    },
-    {
-      title: "Ingridients",
+      title: "Inventory",
       url: "/admin/ingridients",
-      icon: IconPuzzle,
+      icon: IconDatabase,
+    },
+    {
+      title: "Station",
+      url: "/admin/stations",
+      icon: IconBuilding,
     },
     {
       title: "Report",

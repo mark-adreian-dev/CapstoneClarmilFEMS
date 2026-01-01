@@ -8,6 +8,7 @@ import { BrowserRouter } from 'react-router-dom'
 import { Theme } from './types/Theme.ts'
 import { ThemeProvider } from './components/theme-provider.tsx'
 import { EmployeeState } from './context/EmployeeContext/EmployeeState.tsx'
+import { IngridientState } from './context/IngridientsContext/IngridientsState.tsx'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
@@ -15,8 +16,10 @@ createRoot(document.getElementById('root')!).render(
       <BrowserRouter>
         <AuthState>
           <EmployeeState>
-            <Toaster richColors position="top-center" />
-            <App />
+            <IngridientState>
+              <Toaster richColors position="top-center" />
+              <App />
+            </IngridientState>
           </EmployeeState>
         </AuthState> 
       </BrowserRouter>

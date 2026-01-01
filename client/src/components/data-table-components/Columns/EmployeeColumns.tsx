@@ -1,15 +1,11 @@
-import {  IconDotsVertical, IconGenderFemale, IconGenderMale, IconMail } from "@tabler/icons-react"
+import { IconGenderFemale, IconGenderMale, IconMail } from "@tabler/icons-react"
 import type { ColumnDef } from "@tanstack/react-table"
-import { Button } from "../../ui/button"
 import { Checkbox } from "../../ui/checkbox"
 import { Badge } from "../../ui/badge"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "../../ui/dropdown-menu"
 import DragHandle from "../ColumnComponents/DragHandle"
 import type { Employee } from "@/types/Employee"
 import { Sex, UserRole } from "@/types/User"
-import DeleteEmployeeDialog from "@/components/pages/Admin/EmployeeManagement/DeleteEmployeeDialog"
-import ShowPasswordDialog from "@/components/pages/Admin/EmployeeManagement/ShowPasswordDialog"
-import EditUserForm from "@/components/pages/Admin/EmployeeManagement/EditUserForm"
+import { EmployeeActions } from "./Actions/EmployeeActions"
 
 
 export const employeeColumn: ColumnDef<Employee>[] = [
@@ -153,38 +149,7 @@ export const employeeColumn: ColumnDef<Employee>[] = [
     header: "Actions",
     enableHiding: true,
     cell: ({ row }) => (
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button
-            variant="ghost"
-            className="data-[state=open]:bg-muted text-muted-foreground flex size-8"
-            size="icon"
-          >
-            <IconDotsVertical />
-            <span className="sr-only">Open menu</span>
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="w-fit">
-          <DropdownMenuItem className="cursor-pointer" onSelect={(e) => {
-            e.preventDefault(); // Prevents the dropdown from closing immediately in a way that breaks the dialog focus
-          }}>
-            <EditUserForm targetID={row.original.id}/>
-          </DropdownMenuItem>
-          <DropdownMenuItem className="cursor-pointer" onClick={(e) => {
-            e.preventDefault()
-            e.stopPropagation()
-          }}>
-            <ShowPasswordDialog password={row.original.plain_password} />
-          </DropdownMenuItem>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem className="cursor-pointer p-0" onClick={(e) => {
-            e.preventDefault()
-            e.stopPropagation()
-          }}>
-            <DeleteEmployeeDialog id={row.original.id} />
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
+      <EmployeeActions row={row}/>
     ),
   },
 ]

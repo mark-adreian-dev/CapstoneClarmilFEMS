@@ -1,4 +1,4 @@
-import React, { useEffect, useReducer } from 'react';
+import React, { useCallback, useEffect, useMemo, useReducer } from 'react';
 import { AuthReducer } from './AuthReducer';
 import { AuthContext, initialAuthContextValue } from './AuthContext';
 import { api } from '@/utils/api';
@@ -19,18 +19,17 @@ export const AuthState: React.FC<{ children: React.ReactNode }> = ({
     const reload = async () => {
       const xsrf = getCookie("XSRF-TOKEN")
   
-      if (xsrf) { 
+      if (xsrf) {
         try {
           authDispatch({ type: "SET_LOADING", payload: true })
           authDispatch({ type: "SET_LOGGING_IN", payload: true })
           const userData = await loadUser();
 
-          if (userData) {
+          if (userData && userData.role) {
             authDispatch({
               type: 'LOGIN_SUCCESS',
               payload: userData.role,
             });
-            handleAuthRedirect(userData.role)
           }
 
         } catch (error) {
@@ -43,10 +42,10 @@ export const AuthState: React.FC<{ children: React.ReactNode }> = ({
     }
     reload()
   
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  const handleAuthRedirect = (role: UserRole) => {
+  const handleAuthRedirect = useCallback((role: UserRole) => {
     const redirectPaths: Record<UserRole, string> = {
       [UserRole.MEASURING]: "/worker",
       [UserRole.RECIEVER]: "/worker/reciever",
@@ -55,9 +54,9 @@ export const AuthState: React.FC<{ children: React.ReactNode }> = ({
     }
 
     navigate(redirectPaths[role])
-   }
+  }, [navigate])
 
-  const handleLogoutRedirect = (role: UserRole) => {
+  const handleLogoutRedirect = useCallback((role: UserRole) => {
     const loginPaths: Record<UserRole, string> = {
       [UserRole.MEASURING]: "/login/worker",
       [UserRole.RECIEVER]: "/login/worker",
@@ -66,10 +65,10 @@ export const AuthState: React.FC<{ children: React.ReactNode }> = ({
     }
 
     navigate(loginPaths[role])
-  }
+  }, [navigate])
 
   // 🔹 Load authenticated user
-  const loadUser = async () => {
+  const loadUser = useCallback(async () => {
     try {
       authDispatch({ type: "SET_LOADING", payload: true })
       const response = await api.get('/api/user');
@@ -85,10 +84,10 @@ export const AuthState: React.FC<{ children: React.ReactNode }> = ({
     } finally {
       authDispatch({ type: "SET_LOADING", payload: false })
     }
-  };
+  }, [])
 
   // 🔹 Login (context-based)
-  const login = async (
+  const login = useCallback(async (
     employee_id: string,
     password: string,
     context: UserContextRole
@@ -111,7 +110,7 @@ export const AuthState: React.FC<{ children: React.ReactNode }> = ({
       });
 
       const userData: User | undefined = await loadUser();
-      if(userData) handleAuthRedirect(userData.role)
+      if (userData && userData.role) handleAuthRedirect(userData.role)
     } catch (error) {
       handleError(error)
       deleteCookie("XSRF-TOKEN")
@@ -119,10 +118,10 @@ export const AuthState: React.FC<{ children: React.ReactNode }> = ({
       authDispatch({ type: "SET_LOADING", payload: false })
       authDispatch({ type: "SET_LOGGING_IN", payload: false })
     }
-  };
+  }, [handleAuthRedirect, loadUser])
 
   // 🔹 Logout
-  const logout = async () => {
+  const logout = useCallback(async () => {
     authDispatch({ type: "SET_LOADING", payload: true })
     try {
       if (authState.role) {
@@ -133,21 +132,26 @@ export const AuthState: React.FC<{ children: React.ReactNode }> = ({
         handleLogoutRedirect(userRole)
       }
     } catch (error) {
-        handleError(error)
+      handleError(error)
     } finally {
       authDispatch({ type: "SET_LOADING", payload: false })
     }
-  };
+  }, [authState.role, handleLogoutRedirect])
+
+  const value = useMemo(() => ({
+    ...authState,
+    loadUser,
+    login,
+    logout,
+  }), [
+    authState,
+    loadUser,
+    login,
+    logout
+  ])
 
   return (
-    <AuthContext.Provider
-      value={{
-        ...authState,
-        loadUser,
-        login,
-        logout,
-      }}
-    >
+    <AuthContext.Provider value={value}>
       {children}
     </AuthContext.Provider>
   );

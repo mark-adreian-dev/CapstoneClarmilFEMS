@@ -11,7 +11,7 @@ import SystemAdminLayout from "./layout/SystemAdminLayout"
 import AdminDashboardPage from "./pages/Admin/AdminDashboardPage"
 import AdminUsersPage from "./pages/Admin/AdminUsersPage"
 import AdminIngridientsPage from "./pages/Admin/AdminIngridientsPage"
-import AdminAreasPage from "./pages/Admin/AdminAreasPage"
+import AdminStationPage from "./pages/Admin/AdminStationPage"
 
 
 function App() {
@@ -61,7 +61,7 @@ function App() {
         >
           <Route index element={<AdminDashboardPage />}/>
           <Route path="users" element={<AdminUsersPage />}/>
-          <Route path="areas" element={<AdminAreasPage />}/>
+          <Route path="stations" element={<AdminStationPage />}/>
           <Route path="ingridients" element={<AdminIngridientsPage />}/>
           <Route path="report" element={<h1>Reports</h1>}/>
         </Route>

@@ -20,6 +20,8 @@ interface DialogProps{
   action?: (e?: SyntheticEvent) => Promise<unknown> | unknown
   children?: ReactNode
   isLoading?: boolean
+  open?: boolean
+  onOpenChange?: (open: boolean) => void;
  }
 
 export default function Dialog({
@@ -30,21 +32,45 @@ export default function Dialog({
   action,
   actionButtonColorClassname,
   children,
-  isLoading
+  isLoading,
+  // Destructure the new props
+  open: externalOpen,
+  onOpenChange: setExternalOpen,
 }: DialogProps) {
-  const [isOpen, setIsOpen] = useState<boolean>(false)
+  const [internalOpen, setInternalOpen] = useState<boolean>(false)
+
+  // Determine if the component is being controlled externally
+  const isControlled = externalOpen !== undefined;
+  const isOpen = isControlled ? externalOpen : internalOpen;
+
+  // Create a unified toggle function
+  const handleOpenChange = (open: boolean) => {
+    if (isControlled) {
+      setExternalOpen?.(open);
+    } else {
+      setInternalOpen(open);
+    }
+  };
 
   const handleConfirm = (e: MouseEvent<HTMLButtonElement>) => {
     if (action) {
       action(e);
+      // Close dialog after action if controlled
+      if (isControlled) setExternalOpen?.(false);
     }
   }
-  
+
   return (
-    <AlertDialog onOpenChange={setIsOpen} open={isOpen}>
-      <AlertDialogTrigger asChild>
-        {TriggerComponent}
-      </AlertDialogTrigger>
+    <AlertDialog onOpenChange={handleOpenChange} open={isOpen}>
+      {/* Only render the trigger if NOT controlled. 
+         This prevents the "ghost button" from appearing in your table row. 
+      */}
+      {!isControlled && (
+        <AlertDialogTrigger asChild>
+          {TriggerComponent}
+        </AlertDialogTrigger>
+      )}
+
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>{title}</AlertDialogTitle>
@@ -52,13 +78,18 @@ export default function Dialog({
         </AlertDialogHeader>
         {children}
         <AlertDialogFooter>
-          <AlertDialogCancel className="cursor-pointer">{actionLabel ? "Cancel" : "Close"}</AlertDialogCancel>
-          {
-            actionLabel && <AlertDialogAction disabled={isLoading} onClick={handleConfirm} className={actionButtonColorClassname + " cursor-pointer"}>
+          <AlertDialogCancel className="cursor-pointer">
+            {actionLabel ? "Cancel" : "Close"}
+          </AlertDialogCancel>
+          {actionLabel && (
+            <AlertDialogAction
+              disabled={isLoading}
+              onClick={handleConfirm}
+              className={actionButtonColorClassname + " cursor-pointer"}
+            >
               {actionLabel}
             </AlertDialogAction>
-          }
-         
+          )}
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>

@@ -26,26 +26,31 @@ import {
   Tabs,
 } from "@/components/ui/tabs"
 import TableTabFilters from "./data-table-components/TableTabFilters"
-import { useEffect, useState, type ComponentType, type Dispatch } from "react"
+import { useMemo, type ComponentType } from "react"
 import TabContent from "./data-table-components/TabContent"
-import { employeeCategory } from "@/utils/UserRolesList"
 
-interface DataTableProps<T extends { id: number | string } & object> {
-  data: T[]
-  columns: ColumnDef<T>[]
-  ActionButton: ComponentType<{ selectedRows?: Row<T>[] }>
+interface DataTableProps<TData extends { id: number | string } & object, K extends string | number> {
+  data: TData[]
+  columns: ColumnDef<TData>[]
+  ActionButton: ComponentType<{ selectedRows?: Row<TData>[] }>
   activeTab: string
-  setActiveTab: Dispatch<string>
+  placeholder: string
+  onTabChange: (value: K | string) => void
+  category: Record<K | string, string>
+  searchColumn: Extract<keyof TData, string>;
 }
 
-export function DataTable<T extends { id: number | string } & object>({
-  data: initialData,
+export function DataTable<TData extends { id: number | string } & object, K extends string | number>({
+  data,
   columns,
   ActionButton,
+  placeholder,
   activeTab,
-  setActiveTab
-}: DataTableProps<T>) {
-  const [data, setData] = useState(() => initialData)
+  onTabChange,
+  category,
+  searchColumn
+  
+}: DataTableProps<TData, K>) {
   const [rowSelection, setRowSelection] = React.useState({})
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({})
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
@@ -62,21 +67,19 @@ export function DataTable<T extends { id: number | string } & object>({
     pageSize: 20,
   })
   
-
+  
   const dataIds = React.useMemo<UniqueIdentifier[]>(
     () => data?.map(({ id }) => id) || [],
     [data]
   )
+  const memoizedColumn = useMemo(() => columns, [columns]);
 
-  useEffect(() => {
-    setData(initialData)
-  }, [initialData])
-
+  
 
   // eslint-disable-next-line react-hooks/incompatible-library
   const table = useReactTable({
     data,
-    columns,
+    columns: memoizedColumn,
     state: {
       sorting,
       columnVisibility,
@@ -103,40 +106,32 @@ export function DataTable<T extends { id: number | string } & object>({
   return (
     <Tabs
       value={activeTab}
-      onValueChange={setActiveTab}
-      defaultValue="all"
+      onValueChange={onTabChange}
       className="w-full flex-col justify-start gap-6"
     >
       <div className="flex items-center justify-between px-4 lg:px-6">
         <TableTabFilters
-          employeeCategory={employeeCategory}
+          searchColumn={searchColumn}
+          placeholder={placeholder}
+          category={category}
           table={table}
           ActionButton={ActionButton}
+          activeTab={activeTab}
+          onTabChange={onTabChange}
         />
       </div>
-
-      <TabContent
-        tabValue={"all"}
-        sortableId={sortableId}
-        dataIds={dataIds}
-        sensors={sensors}
-        setData={setData}
-        table={table}
-      />
-      {
-        Object.entries(employeeCategory).map(([key]) => {
-          
-          return <TabContent
-            key={key}
-            tabValue={key}
+      {Object.values(category).map((value) => (
+          activeTab === value &&
+          <TabContent
+            key={value as string}
+            tabValue={value as string}
             sortableId={sortableId}
             dataIds={dataIds}
             sensors={sensors}
-            setData={setData}
             table={table}
           />
-        })
-      }
+        
+      ))}
     </Tabs>
   )
 }

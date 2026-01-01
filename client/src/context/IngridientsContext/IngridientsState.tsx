@@ -1,139 +1,193 @@
-import React, { useContext, useReducer } from 'react';
+import React, { useCallback, useContext, useMemo, useReducer, useRef } from 'react';
 import { handleError } from '@/utils/errorHandle';
-import { EmployeeReducer } from './StationReducer';
-import { EmployeeContext, initialEmployeeContextValue } from './IngridientsContext';
+import { IngridientReducer } from './IngridientsReducer';
+import { IngridientContext, initialIngridientContextValue } from './IngridientsContext';
 import { AuthContext } from '../AuthContext/AuthContext';
 import { api } from '@/utils/api';
-import type { Employee } from '@/types/Employee';
-import { UserRole, type UserFormType } from '@/types/User';
 import { toast } from 'sonner';
+import type { Ingridient, IngridientFormType, IngridientsCategory } from '@/types/Ingridients';
+import { UserRole } from '@/types/User';
+import { format } from 'date-fns';
 
-interface AddEmployeeResponse {
-  message: string,
-  user: Employee
-}
+type AddIngridientResponse = Ingridient
 
-export const EmployeeState: React.FC<{ children: React.ReactNode }> = ({
+
+export const IngridientState: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
   const { user } = useContext(AuthContext)
-  const [employeeState, employeeDispatch] = useReducer(EmployeeReducer, initialEmployeeContextValue);
-  
-  const isRoleAdmin = () => {
-    if (!user) return false
-    if (user.role !== UserRole.ADMIN) return false
-    return true
-  }
+  const [ingridientState, ingridientDispatch] = useReducer(IngridientReducer, initialIngridientContextValue);
+  const fetchedRef = useRef(false)
 
-  const fetchAllEmployeeData = async () => {
+  const isRoleAdmin = useCallback(() => {
+    return user?.role === UserRole.ADMIN
+  }, [user])
+
+  const formatFormRequestBody = useCallback((ingridientDetails: IngridientFormType) => {
+    const formData = new FormData();
+
+    Object.entries(ingridientDetails).forEach(([key, value]) => {
+      if (key === "expiration_date" && value instanceof Date) {
+        formData.append(key, format(value, 'yyyy-MM-dd'));
+      }
+
+      else if (key === "image_path") {
+        if (value instanceof File) {
+          console.log("Valid File detected, appending as 'image'");
+          formData.append("image", value); // Backend expects 'image'
+        }
+      }
+      else {
+        if (value !== undefined && value !== null) {
+          formData.append(key, String(value));
+        }
+      }
+    });
+
+    return formData;
+  }, []);
+
+  const onTabChange = useCallback((activeTab: IngridientsCategory | string) => {
+    ingridientDispatch({ type: "SET_ACTIVE_TAB", payload: activeTab as IngridientsCategory })
+  }, [])
+
+  const fetchAllIngridientsData = useCallback(async () => {
     if (!isRoleAdmin()) return
+    if (fetchedRef.current) return
+
+    try {
+      ingridientDispatch({ type: "SET_LOADING", payload: true })
+      const ingridientDataResponse = await api.get("/api/ingridients")
+      const ingridientData: Ingridient[] = ingridientDataResponse.data
+      ingridientDispatch({ type: "SET_INGRIDIENT", payload: ingridientData.reverse() })
+
+    } catch (error) {
+      handleError(error)
+    } finally {
+      ingridientDispatch({ type: "SET_LOADING", payload: false })
+      fetchedRef.current = true
+    }
+  }, [isRoleAdmin])
+
+  const fetchIngridientsData = useCallback(async (ingridientID: number): Promise<Ingridient | undefined> => {
+    if (!isRoleAdmin()) return
+
+    try {
+      ingridientDispatch({ type: "SET_LOADING", payload: true })
+      const ingridientDataResponse = await api.get(`/api/ingridients/${ingridientID}`)
+      const ingridientData: Ingridient = ingridientDataResponse.data
+      return ingridientData
+
+    } catch (error) {
+      handleError(error)
+    } finally {
+      ingridientDispatch({ type: "SET_LOADING", payload: false })
+    }
+  }, [isRoleAdmin])
+
+  const addIngridient = useCallback(async (ingridientDetails: IngridientFormType) => {
+    if (!isRoleAdmin()) return
+    const payload = formatFormRequestBody(ingridientDetails)
+  
+    try {
+      ingridientDispatch({ type: "SET_LOADING", payload: true })
+
+      const response = await api.post(`/api/ingridients`, payload, {
+        headers: {
+          "Content-Type" : undefined
+        }
+      })
+      const responseData: AddIngridientResponse = response.data
+
+      ingridientDispatch({
+        type: "ADD_INGRIDIENT",
+        payload: responseData,
+      })
+
+      toast.success("New Ingridient Added")
+    } catch (error) {
+      handleError(error)
+    } finally {
+      ingridientDispatch({ type: "SET_LOADING", payload: false })
+    }
+  }, [formatFormRequestBody, isRoleAdmin])
+
+  const updateIngridient = useCallback(async (id: number, ingridientDetails: IngridientFormType) => {
+    if (!isRoleAdmin()) return
+ 
+    const payload = formatFormRequestBody(ingridientDetails)
     
     try {
-      employeeDispatch({ type: "SET_LOADING", payload: true})
-      const employeeDataResponse = await api.get("/api/users")
-      const employeeData: Employee[] = employeeDataResponse.data
-      employeeDispatch({ type: "SET_EMPLOYEES", payload: employeeData.reverse() })
+      ingridientDispatch({ type: "SET_LOADING", payload: true })
+      const response = await api.put(`/api/ingridients/${id}`, payload, {
+        headers: {
+          "Content-Type": undefined
+        }
+      })
+      const updatedIngridient: Ingridient = response.data
+      ingridientDispatch({ type: "UPDATE_INGRIDIENT", payload: updatedIngridient })
+      toast.success("Ingridient updated successfully")
 
     } catch (error) {
       handleError(error)
     } finally {
-      employeeDispatch({ type: "SET_LOADING", payload: false })
+      ingridientDispatch({ type: "SET_LOADING", payload: false })
     }
-  } 
+  }, [formatFormRequestBody, isRoleAdmin])
 
-  const fetchEmployeeData = async (employeeID: number): Promise<Employee | undefined>  => {
-    if (!isRoleAdmin()) return 
-
-    try {
-      employeeDispatch({ type: "SET_LOADING", payload: true })
-      const employeeDataResponse = await api.get(`/api/users/${employeeID}`)
-      const employeeData: Employee = employeeDataResponse.data
-      return employeeData
-
-    } catch (error) {
-      handleError(error)
-    } finally {
-      employeeDispatch({ type: "SET_LOADING", payload: false })
-    }
-  } 
-
-  const addEmployee = async (employeeDetails: UserFormType) => {
-    if (!isRoleAdmin()) return
-
-    try {
-      employeeDispatch({ type: "SET_LOADING", payload: true })
-      const response = await api.post(`/api/users`, employeeDetails)
-      const responseData: AddEmployeeResponse = response.data
-      employeeDispatch({ type: "ADD_EMPLOYEE", payload: responseData.user })
-      toast.success(responseData.message)
-
-    } catch (error) {
-      handleError(error)
-    } finally {
-      employeeDispatch({ type: "SET_LOADING", payload: false })
-    }
-  }
-
-  const updateEmployee = async (id: number, employeeDetails: UserFormType) => {
-    if (!isRoleAdmin()) return
-
-    try {
-      employeeDispatch({ type: "SET_LOADING", payload: true })
-      const response = await api.put(`/api/users/${id}`, employeeDetails)
-      const updatedEmployee: Employee = response.data
-      employeeDispatch({ type: "UPDATE_EMPLOYEE", payload: updatedEmployee })
-      toast.success("Employee updated successfully")
-
-    } catch (error) {
-      handleError(error)
-    } finally {
-      employeeDispatch({ type: "SET_LOADING", payload: false })
-    }
-  }
-
-  const deleteEmployee = async (id: number) => {
-    if (!isRoleAdmin()) return 
-    try {
-      employeeDispatch({ type: "SET_LOADING", payload: true })
-      await api.delete(`/api/users/${id}`)
-      employeeDispatch({ type: "REMOVE_EMPLOYEE", payload: id })
-      toast.success("Employee is successfully removed.")
-    } catch (error) {
-      handleError(error)
-    } finally {
-      employeeDispatch({ type: "SET_LOADING", payload: false })
-    }
-  }
-  
-  const deleteBulkEmployee = async (ids: number[]) => {
+  const deleteIngridient = useCallback(async (id: number) => {
     if (!isRoleAdmin()) return
     try {
-      employeeDispatch({ type: "SET_LOADING", payload: true })
-      const response = await api.delete(`/api/users/bulk`, {
+      ingridientDispatch({ type: "SET_LOADING", payload: true })
+      await api.delete(`/api/ingridients/${id}`)
+      ingridientDispatch({ type: "REMOVE_INGRIDIENT", payload: id })
+      toast.success("Ingridient is successfully removed.")
+    } catch (error) {
+      handleError(error)
+    } finally {
+      ingridientDispatch({ type: "SET_LOADING", payload: false })
+    }
+  }, [isRoleAdmin])
+
+  const deleteBulkIngridients = useCallback(async (ids: number[]) => {
+    if (!isRoleAdmin()) return
+    try {
+      ingridientDispatch({ type: "SET_LOADING", payload: true })
+      const response = await api.delete(`/api/ingridients/bulk`, {
         data: { ids: ids }
       })
-      employeeDispatch({ type: "REMOVE_EMPLOYEES", payload: ids })
+      ingridientDispatch({ type: "REMOVE_INGRIDIENTS", payload: ids })
       toast.success(response.data.message)
     } catch (error) {
       handleError(error)
     } finally {
-      employeeDispatch({ type: "SET_LOADING", payload: false })
+      ingridientDispatch({ type: "SET_LOADING", payload: false })
     }
-  }
+  }, [isRoleAdmin])
+
+  const value = useMemo(() => ({
+    ...ingridientState,
+    fetchAllIngridientsData,
+    fetchIngridientsData,
+    addIngridient,
+    updateIngridient,
+    deleteIngridient,
+    deleteBulkIngridients,
+    onTabChange
+  }), [
+    ingridientState,
+    fetchAllIngridientsData,
+    fetchIngridientsData,
+    addIngridient,
+    updateIngridient,
+    deleteIngridient,
+    deleteBulkIngridients,
+    onTabChange
+  ])
 
   return (
-    <EmployeeContext.Provider
-      value={{
-        ...employeeState,
-        fetchAllEmployeeData,
-        fetchEmployeeData,
-        deleteEmployee,
-        deleteBulkEmployee,
-        addEmployee,
-        updateEmployee
-      }}
-    >
+    <IngridientContext.Provider value={value}>
       {children}
-    </EmployeeContext.Provider>
+    </IngridientContext.Provider>
   );
 };

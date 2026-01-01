@@ -1,30 +1,33 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import type { Employee } from '@/types/Employee';
-import type { UserFormType } from '@/types/User';
+import { IngridientsCategory, type Ingridient, type IngridientFormType } from '@/types/Ingridients';
 import { createContext } from 'react';
 
-export interface EmployeeContextType {
-  employees: Employee[];
+export interface IngridientsContextType {
+  ingridients: Ingridient[];
   error: string | null;
   isLoading: boolean;
-  fetchAllEmployeeData: () => Promise<void>
-  fetchEmployeeData: (employeeID: number) => Promise<Employee | undefined>
-  deleteEmployee: (id: number) => Promise<void>
-  deleteBulkEmployee: (ids: number[]) => Promise<void>
-  addEmployee: (employeeDetails: UserFormType) => Promise<void>
-  updateEmployee: (id: number, employeeDetails: UserFormType) => Promise<void>
+  activeTab: IngridientsCategory
+  fetchAllIngridientsData: () => Promise<void>
+  fetchIngridientData: (ingridientID: number) => Promise<Ingridient | undefined>
+  deleteIngridient: (id: number) => Promise<void>
+  deleteBulkIngridient: (ids: number[]) => Promise<void>
+  addIngridient: (ingridientDetails: IngridientFormType) => Promise<void>
+  updateIngridient: (id: number, ingridientDetails: IngridientFormType) => Promise<void>
+  onTabChange: (activeTab: IngridientsCategory | string) => void
 }
 
-export const initialEmployeeContextValue: EmployeeContextType = {
-  employees: [],
+export const initialIngridientContextValue: IngridientsContextType = {
+  ingridients: [],
   isLoading: false,
   error: null,
-  fetchAllEmployeeData: async () => { },
-  fetchEmployeeData: async (_employeeID: number) => { return undefined },
-  deleteEmployee: async (_id: number) => { },
-  deleteBulkEmployee: async (_ids: number[]) => { },
-  addEmployee: async (_employeeDetails: UserFormType) => {},
-  updateEmployee: async (_id: number, _employeeDetails: UserFormType) => {}
+  activeTab: IngridientsCategory.ALL,
+  fetchAllIngridientsData: async () => { },
+  fetchIngridientData: async (_ingridientID: number) => { return undefined },
+  deleteIngridient: async (_id: number) => { },
+  deleteBulkIngridient: async (_ids: number[]) => { },
+  addIngridient: async (_ingridientDetails: IngridientFormType) => { },
+  updateIngridient: async (_id: number, _ingridientDetails: IngridientFormType) => { },
+  onTabChange: (_activeTab: IngridientsCategory | string) => { }
 }
 
-export const EmployeeContext = createContext<EmployeeContextType>(initialEmployeeContextValue);
+export const IngridientContext = createContext<IngridientsContextType>(initialIngridientContextValue);
