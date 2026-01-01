@@ -73,6 +73,11 @@ class UserController extends Controller
         ], 201);
     }
 
+    public function show(User $user)
+    {
+        return $user;
+    }
+
     public function update(UpdateUserRequest $request, User $user)
     {
         $validated = $request->validated();

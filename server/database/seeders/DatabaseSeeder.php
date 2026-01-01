@@ -18,7 +18,7 @@ class DatabaseSeeder extends Seeder
         $this->call([
             StationSeeder::class,
             UserSeeder::class,
-            PremixSeeder::class,
+            IngridientSeeder::class,
         //  BarcodeSeeder::class,
             WorkSessionSeeder::class,
             OperationConfigSeeder::class,

@@ -4,7 +4,7 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use App\Models\Barcode;
-use App\Models\Premix;
+use App\Models\Ingridient;
 use App\Models\Station;
 
 class BarcodeSeeder extends Seeder
@@ -12,10 +12,10 @@ class BarcodeSeeder extends Seeder
     public function run(): void
     {
         $measuring = Station::where('name', 'Measuring Room')->first();
-        $premixes = Premix::all();
+        $premixes = Ingridient::all();
 
         if ($premixes->isEmpty()) {
-            $premixes = Premix::factory(5)->create();
+            $premixes = Ingridient::factory(5)->create();
         }
 
         foreach ($premixes as $premix) {

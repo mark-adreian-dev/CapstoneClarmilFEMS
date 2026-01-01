@@ -23,7 +23,7 @@ class Barcode extends Model
 
     public function premix()
     {
-        return $this->belongsTo(Premix::class);
+        return $this->belongsTo(Ingridient::class);
     }
 
     public function scannedBy()
@@ -36,8 +36,8 @@ class Barcode extends Model
         return $this->belongsTo(User::class, 'verified_by');
     }
 
-    public function department()
+    public function station()
     {
-        return $this->belongsTo(Department::class);
+        return $this->belongsTo(Station::class);
     }
 }

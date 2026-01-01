@@ -2,12 +2,12 @@
 
 namespace Database\Factories;
 
-use App\Models\Premix;
+use App\Models\Ingridient;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
-class PremixFactory extends Factory
+class IngridientFactory extends Factory
 {
-    protected $model = Premix::class;
+    protected $model = Ingridient::class;
 
     public function definition()
     {

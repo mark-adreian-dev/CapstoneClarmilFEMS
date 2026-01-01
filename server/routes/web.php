@@ -3,7 +3,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\StationController;
 use App\Http\Controllers\UserController;
-use App\Http\Controllers\PremixController;
+use App\Http\Controllers\IngridientController;
 use App\Http\Controllers\BarcodeController;
 use App\Http\Controllers\WorkSessionController;
 use App\Http\Controllers\OperationConfigController;
@@ -20,7 +20,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('api')->group(function () {
     Route::apiResource('users', UserController::class);
    
     Route::apiResource('stations', StationController::class);
-    Route::apiResource('premixes', PremixController::class);
+    Route::apiResource('ingridients', IngridientController::class);
 });
 
 Route::middleware(['auth'])->prefix('api')->group(function () {
