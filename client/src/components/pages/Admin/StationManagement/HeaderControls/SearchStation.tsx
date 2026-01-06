@@ -1,14 +1,12 @@
 import { Input } from "@/components/ui/input";
+import { StationPageContext } from "@/pages/Admin/AdminStationPage";
 import { IconSearch } from "@tabler/icons-react";
+import { useContext } from "react";
 
-interface SearchStationProps {
-  query: string
-  setQuery: (query: string) => void
-}
-
-export default function SearchStation({ query, setQuery } : SearchStationProps) {
+export default function SearchStation() {
+  const { query, setQuery } = useContext(StationPageContext)
   return (
-    <div className="flex items-center min-w-full w-full gap-4 mb-4">
+    <div className="flex items-center w-full max-w-[400px] gap-4">
       <IconSearch />
       <Input
         placeholder={"Search stations..."}

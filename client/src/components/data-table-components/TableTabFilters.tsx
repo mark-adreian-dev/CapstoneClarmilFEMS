@@ -29,9 +29,8 @@ function TableTabFilters<TData extends object, K extends string | number>({
   const selectedRows = table.getSelectedRowModel().rows;
 
   return (
-    <div className="flex items-start justify-between w-full">
-      
-      <div>
+    <div className="flex items-start justify-between w-full gap-10">
+      <div className="w-full">
         <TableSearchField
           placeholder={placeholder}
           table={table}
@@ -44,9 +43,6 @@ function TableTabFilters<TData extends object, K extends string | number>({
         />
         <TabListFilter category={category} />
       </div>
-     
-     
-
       <div className="flex items-center gap-2">
         <ColumnTabFilter table={table} />
         <ActionButton selectedRows={selectedRows} />

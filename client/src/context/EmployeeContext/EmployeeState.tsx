@@ -1,15 +1,15 @@
-import React, { useCallback, useContext, useMemo, useReducer, useRef } from 'react';
+import React, { useCallback, useContext, useEffect, useMemo, useReducer, useRef } from 'react';
 import { handleError } from '@/utils/errorHandle';
 import { EmployeeReducer } from './EmployeeReducer';
 import { EmployeeContext, initialEmployeeContextValue } from './EmployeeContext';
 import { AuthContext } from '../AuthContext/AuthContext';
 import { api } from '@/utils/api';
-import type { Employee, EmployeeCategory } from '@/types/Employee';
+import { EmployeeCategory, type Employee, type Station } from '@/types/Employee';
 import { UserRole, type UserFormType } from '@/types/User';
 import { toast } from 'sonner';
 import { arrayMove } from '@dnd-kit/sortable';
 import { format } from 'date-fns';
-
+import { useLocation } from 'react-router-dom';
 interface AddEmployeeResponse {
   message: string,
   user: Employee
@@ -20,7 +20,8 @@ export const EmployeeState: React.FC<{ children: React.ReactNode }> = ({
 }) => {
   const { user } = useContext(AuthContext)
   const [employeeState, employeeDispatch] = useReducer(EmployeeReducer, initialEmployeeContextValue);
-  const fetchedRef = useRef<boolean>(false)
+  const emplyoeeFetchedRef = useRef<boolean>(false)
+  const location = useLocation()
 
   const reorderEmployees = useCallback((oldIndex: number, newIndex: number) => {
     employeeDispatch({
@@ -39,7 +40,7 @@ export const EmployeeState: React.FC<{ children: React.ReactNode }> = ({
 
   const fetchAllEmployeeData = useCallback(async () => {
     if (!isRoleAdmin()) return
-    if (fetchedRef.current) return
+    if (emplyoeeFetchedRef.current) return
 
     try {
       employeeDispatch({ type: "SET_LOADING", payload: true })
@@ -51,7 +52,7 @@ export const EmployeeState: React.FC<{ children: React.ReactNode }> = ({
       handleError(error)
     } finally {
       employeeDispatch({ type: "SET_LOADING", payload: false })
-      fetchedRef.current = true
+      emplyoeeFetchedRef.current = true
     }
   }, [isRoleAdmin])
 
@@ -82,7 +83,6 @@ export const EmployeeState: React.FC<{ children: React.ReactNode }> = ({
 
       const response = await api.post(`/api/users`, payload)
       const responseData: AddEmployeeResponse = response.data
-
       employeeDispatch({
         type: "ADD_EMPLOYEE",
         payload: responseData.user,
@@ -100,8 +100,10 @@ export const EmployeeState: React.FC<{ children: React.ReactNode }> = ({
     if (!isRoleAdmin()) return
     const payload = {
       ...employeeDetails,
+      station_id: !employeeDetails.station_id ? null : (employeeDetails.role === UserRole.MANAGER || employeeDetails.role === UserRole.ADMIN) ? null : employeeDetails.station_id ,
       birthdate: employeeDetails.birthdate ? format(employeeDetails.birthdate, 'yyyy-MM-dd') : null
     }
+
     try {
       employeeDispatch({ type: "SET_LOADING", payload: true })
       const response = await api.put(`/api/users/${id}`, payload)
@@ -146,6 +148,29 @@ export const EmployeeState: React.FC<{ children: React.ReactNode }> = ({
     }
   },[isRoleAdmin])
 
+  const assignEmployees = useCallback(async (employesIDs: number[], stationData: Station) => {
+    if (!isRoleAdmin()) return
+    try {
+      employeeDispatch({ type: "SET_LOADING", payload: true })
+      const response = await api.put(`/api/users/assign`, 
+        {
+          ids: employesIDs,
+          station_id: stationData.id
+        }
+      )
+      
+      employeeDispatch({ type: "ASSIGN_EMPLOYEES", payload: { ids: employesIDs, stationData } })
+      toast.success(response.data.message)
+    } catch (error) {
+      handleError(error)
+    } finally {
+      employeeDispatch({ type: "SET_LOADING", payload: false })
+    }
+  }, [isRoleAdmin])
+
+  useEffect(() => {
+    onTabChange(EmployeeCategory.ALL)
+  }, [location, onTabChange])
 
   const value = useMemo(() => ({
     ...employeeState,
@@ -156,7 +181,10 @@ export const EmployeeState: React.FC<{ children: React.ReactNode }> = ({
     deleteEmployee,
     deleteBulkEmployee,
     reorderEmployees,
-    onTabChange
+    onTabChange,
+    emplyoeeFetchedRef,
+    assignEmployees,
+    employeeDispatch
   }), [
     employeeState,
     fetchAllEmployeeData,
@@ -166,7 +194,10 @@ export const EmployeeState: React.FC<{ children: React.ReactNode }> = ({
     deleteEmployee,
     deleteBulkEmployee,
     reorderEmployees,
-    onTabChange
+    onTabChange,
+    emplyoeeFetchedRef,
+    assignEmployees,
+    employeeDispatch
   ])
 
   return (

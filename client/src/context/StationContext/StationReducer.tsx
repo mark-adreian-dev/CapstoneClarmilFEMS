@@ -1,20 +1,22 @@
-import type { IngridientsContextType } from "./StationContext";
-import type { Ingridient, IngridientsCategory } from "@/types/Ingridients";
+import type { StationsCategory, Station } from "@/types/Station";
+import type { StationsContextType } from "./StationContext";
 
 
-export type IngridientsAction =
+export type StationsAction =
   | { type: 'SET_LOADING', payload: boolean }
   | { type: 'SET_ERROR', payload: string }
-  | { type: 'SET_ACTIVE_TAB', payload: IngridientsCategory }
+  | { type: 'SET_ACTIVE_TAB', payload: StationsCategory }
   | { type: 'AUTH_STATUS_RESET' }
 
-  | { type: 'SET_INGRIDIENT', payload: Ingridient[] }
-  | { type: 'ADD_INGRIDIENT', payload: Ingridient }
-  | { type: 'UPDATE_INGRIDIENT', payload: Ingridient }
-  | { type: 'REMOVE_INGRIDIENT', payload: number }
-  | { type: 'REMOVE_INGRIDIENTS', payload: number[] }
-
-export const IngridientReducer = (state: IngridientsContextType, action: IngridientsAction): IngridientsContextType => {
+  | { type: 'SET_STATION', payload: Station[] }
+  | { type: 'ADD_STATION', payload: Station }
+  | { type: 'ASSIGN_MANAGER', payload: { id: number, employeeID: number} }
+  | { type: 'UNASSIGN_MANAGER', payload: { id: number } }
+  | { type: 'UPDATE_STATION', payload: Station }
+  | { type: 'REMOVE_STATION', payload: number }
+  | { type: 'REMOVE_STATIONS', payload: number[] }
+  
+export const StationReducer = (state: StationsContextType, action: StationsAction): StationsContextType => {
   switch (action.type) {
     case "SET_LOADING":
       return {
@@ -37,36 +39,73 @@ export const IngridientReducer = (state: IngridientsContextType, action: Ingridi
         error: null,
         isLoading: false
       }
-    case "SET_INGRIDIENT":
+    case "SET_STATION":
       return {
         ...state,
-        ingridients: action.payload
+        stations: action.payload
       }
-    case "ADD_INGRIDIENT":
+    case "ADD_STATION":
       return {
         ...state,
-        ingridients: [action.payload, ...state.ingridients]
+        stations: [action.payload, ...state.stations]
       }
-    case "UPDATE_INGRIDIENT":
+    case "ASSIGN_MANAGER": {
+      const { id, employeeID } = action.payload;
+
+      const updatedStationsList = state.stations.map((station) => {
+        if (station.id === id) {
+          return {
+            ...station,       
+            manager_id: employeeID,
+          };
+        }
+        return station;
+      });
+
       return {
         ...state,
-        ingridients: state.ingridients.map(ingridient => ingridient.id === action.payload.id ? action.payload : ingridient)
-      }
-    case "REMOVE_INGRIDIENT":
+        stations: updatedStationsList,
+      };
+    }
+    case "UNASSIGN_MANAGER": {
+      const { id } = action.payload;
+
+      const updatedStationsList = state.stations.map((station) => {
+        if (station.id === id) {
+          return {
+            ...station,
+            manager_id: null,
+          };
+        }
+        return station;
+      });
+
       return {
         ...state,
-        ingridients: state.ingridients.filter(ingridient => ingridient.id !== action.payload)
+        stations: updatedStationsList,
+      };
+    }
+      
+    case "UPDATE_STATION":
+      return {
+        ...state,
+        stations: state.stations.map(station => station.id === action.payload.id ? action.payload : station)
       }
-    case "REMOVE_INGRIDIENTS": {
-      const updatedIngridientsList = state.ingridients.filter(
-        (ingridient) => !action.payload.includes(ingridient.id)
+    case "REMOVE_STATION":
+      return {
+        ...state,
+        stations: state.stations.filter(station => station.id !== action.payload)
+      }
+    case "REMOVE_STATIONS": {
+      const updatedStationsList = state.stations.filter(
+        (station) => !action.payload.includes(station.id)
       );
       return {
         ...state,
-        ingridients: updatedIngridientsList
+        stations: updatedStationsList
       };
     }
-     
+   
     default:
       return state;
   }

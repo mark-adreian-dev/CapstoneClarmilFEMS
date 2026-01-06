@@ -16,10 +16,11 @@ interface FormProps<T extends object> {
   triggerTitle: string;
   formType: FormType
   triggerIcon: Icon
+  submitIcon: Icon
   targetID?: number
   children: (form: FormInstance<T>) => ReactNode;
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
 }
 export default function Form<T extends object>({
   formSchema,
@@ -29,6 +30,7 @@ export default function Form<T extends object>({
   formType,
   description,
   triggerTitle,
+  submitIcon,
   triggerIcon,
   targetID,
   children,

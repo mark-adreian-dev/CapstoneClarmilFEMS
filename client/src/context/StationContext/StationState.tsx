@@ -1,193 +1,216 @@
 import React, { useCallback, useContext, useMemo, useReducer, useRef } from 'react';
 import { handleError } from '@/utils/errorHandle';
-import { IngridientReducer } from './IngridientsReducer';
-import { IngridientContext, initialIngridientContextValue } from './StationContext';
+import { StationReducer } from './StationReducer';
+import { StationContext, initialStationContextValue } from './StationContext';
 import { AuthContext } from '../AuthContext/AuthContext';
 import { api } from '@/utils/api';
 import { toast } from 'sonner';
-import type { Ingridient, IngridientFormType, IngridientsCategory } from '@/types/Ingridients';
 import { UserRole } from '@/types/User';
-import { format } from 'date-fns';
+import type { Station, StationFormType, StationsCategory } from '@/types/Station';
+import { EmployeeContext } from '../EmployeeContext/EmployeeContext';
+import { IngridientContext } from '../IngridientsContext/IngridientsContext';
+import type { Employee } from '@/types/Employee';
 
-type AddIngridientResponse = Ingridient
+type AddStationResponse = Station
 
 
-export const IngridientState: React.FC<{ children: React.ReactNode }> = ({
+export const StationState: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
   const { user } = useContext(AuthContext)
-  const [ingridientState, ingridientDispatch] = useReducer(IngridientReducer, initialIngridientContextValue);
-  const fetchedRef = useRef(false)
+  const { updateEmployee, employees, employeeDispatch } = useContext(EmployeeContext)
+  const { emplyoeeFetchedRef, fetchAllEmployeeData } = useContext(EmployeeContext)
+  const { ingridientsFetchedRef, fetchAllIngridientsData } = useContext(IngridientContext)
+  
+  const [stationState, stationDispatch] = useReducer(StationReducer, initialStationContextValue);
+  const stationFetchedRef = useRef(false)
 
   const isRoleAdmin = useCallback(() => {
     return user?.role === UserRole.ADMIN
   }, [user])
 
-  const formatFormRequestBody = useCallback((ingridientDetails: IngridientFormType) => {
-    const formData = new FormData();
-
-    Object.entries(ingridientDetails).forEach(([key, value]) => {
-      if (key === "expiration_date" && value instanceof Date) {
-        formData.append(key, format(value, 'yyyy-MM-dd'));
-      }
-
-      else if (key === "image_path") {
-        if (value instanceof File) {
-          console.log("Valid File detected, appending as 'image'");
-          formData.append("image", value); // Backend expects 'image'
-        }
-      }
-      else {
-        if (value !== undefined && value !== null) {
-          formData.append(key, String(value));
-        }
-      }
-    });
-
-    return formData;
-  }, []);
-
-  const onTabChange = useCallback((activeTab: IngridientsCategory | string) => {
-    ingridientDispatch({ type: "SET_ACTIVE_TAB", payload: activeTab as IngridientsCategory })
+  const onTabChange = useCallback((activeTab: StationsCategory | string) => {
+    stationDispatch({ type: "SET_ACTIVE_TAB", payload: activeTab as StationsCategory })
   }, [])
 
-  const fetchAllIngridientsData = useCallback(async () => {
+  const fetchAllStationsData = useCallback(async () => {
     if (!isRoleAdmin()) return
-    if (fetchedRef.current) return
+    if (stationFetchedRef.current) return
+    if (!emplyoeeFetchedRef.current) fetchAllEmployeeData()
+    if (!ingridientsFetchedRef.current) fetchAllIngridientsData()
 
     try {
-      ingridientDispatch({ type: "SET_LOADING", payload: true })
-      const ingridientDataResponse = await api.get("/api/ingridients")
-      const ingridientData: Ingridient[] = ingridientDataResponse.data
-      ingridientDispatch({ type: "SET_INGRIDIENT", payload: ingridientData.reverse() })
+      stationDispatch({ type: "SET_LOADING", payload: true })
+      const stationDataResponse = await api.get("/api/stations")
+      const stationData: Station[] = stationDataResponse.data
+      stationDispatch({ type: "SET_STATION", payload: stationData.reverse() })
 
     } catch (error) {
       handleError(error)
     } finally {
-      ingridientDispatch({ type: "SET_LOADING", payload: false })
-      fetchedRef.current = true
+      stationDispatch({ type: "SET_LOADING", payload: false })
+      stationFetchedRef.current = true
     }
-  }, [isRoleAdmin])
+  }, [emplyoeeFetchedRef, fetchAllEmployeeData, fetchAllIngridientsData, ingridientsFetchedRef, isRoleAdmin])
 
-  const fetchIngridientsData = useCallback(async (ingridientID: number): Promise<Ingridient | undefined> => {
+  const fetchStationsData = useCallback(async (stationID: number): Promise<Station | undefined> => {
     if (!isRoleAdmin()) return
 
     try {
-      ingridientDispatch({ type: "SET_LOADING", payload: true })
-      const ingridientDataResponse = await api.get(`/api/ingridients/${ingridientID}`)
-      const ingridientData: Ingridient = ingridientDataResponse.data
-      return ingridientData
+      stationDispatch({ type: "SET_LOADING", payload: true })
+      const stationDataResponse = await api.get(`/api/stations/${stationID}`)
+      const stationData: Station = stationDataResponse.data
+      return stationData
 
     } catch (error) {
       handleError(error)
     } finally {
-      ingridientDispatch({ type: "SET_LOADING", payload: false })
+      stationDispatch({ type: "SET_LOADING", payload: false })
     }
   }, [isRoleAdmin])
 
-  const addIngridient = useCallback(async (ingridientDetails: IngridientFormType) => {
+  const addStation = useCallback(async (stationDetails: StationFormType) => {
     if (!isRoleAdmin()) return
-    const payload = formatFormRequestBody(ingridientDetails)
-  
+
     try {
-      ingridientDispatch({ type: "SET_LOADING", payload: true })
+      stationDispatch({ type: "SET_LOADING", payload: true })
 
-      const response = await api.post(`/api/ingridients`, payload, {
-        headers: {
-          "Content-Type" : undefined
-        }
-      })
-      const responseData: AddIngridientResponse = response.data
+      const response = await api.post(`/api/stations`, stationDetails)
+      const responseData: AddStationResponse = response.data
 
-      ingridientDispatch({
-        type: "ADD_INGRIDIENT",
+      stationDispatch({
+        type: "ADD_STATION",
         payload: responseData,
       })
 
-      toast.success("New Ingridient Added")
+      toast.success("New Station Added")
     } catch (error) {
       handleError(error)
     } finally {
-      ingridientDispatch({ type: "SET_LOADING", payload: false })
-    }
-  }, [formatFormRequestBody, isRoleAdmin])
-
-  const updateIngridient = useCallback(async (id: number, ingridientDetails: IngridientFormType) => {
-    if (!isRoleAdmin()) return
- 
-    const payload = formatFormRequestBody(ingridientDetails)
-    
-    try {
-      ingridientDispatch({ type: "SET_LOADING", payload: true })
-      const response = await api.put(`/api/ingridients/${id}`, payload, {
-        headers: {
-          "Content-Type": undefined
-        }
-      })
-      const updatedIngridient: Ingridient = response.data
-      ingridientDispatch({ type: "UPDATE_INGRIDIENT", payload: updatedIngridient })
-      toast.success("Ingridient updated successfully")
-
-    } catch (error) {
-      handleError(error)
-    } finally {
-      ingridientDispatch({ type: "SET_LOADING", payload: false })
-    }
-  }, [formatFormRequestBody, isRoleAdmin])
-
-  const deleteIngridient = useCallback(async (id: number) => {
-    if (!isRoleAdmin()) return
-    try {
-      ingridientDispatch({ type: "SET_LOADING", payload: true })
-      await api.delete(`/api/ingridients/${id}`)
-      ingridientDispatch({ type: "REMOVE_INGRIDIENT", payload: id })
-      toast.success("Ingridient is successfully removed.")
-    } catch (error) {
-      handleError(error)
-    } finally {
-      ingridientDispatch({ type: "SET_LOADING", payload: false })
+      stationDispatch({ type: "SET_LOADING", payload: false })
     }
   }, [isRoleAdmin])
 
-  const deleteBulkIngridients = useCallback(async (ids: number[]) => {
+  const updateStation = useCallback(async (id: number, stationDetails: StationFormType) => {
+    if (!isRoleAdmin()) return
+ 
+    try {
+      stationDispatch({ type: "SET_LOADING", payload: true })
+      const response = await api.put(`/api/stations/${id}`, stationDetails)
+      const updatedStation: Station = response.data
+      stationDispatch({ type: "UPDATE_STATION", payload: updatedStation })
+      toast.success("Station updated successfully")
+
+    } catch (error) {
+      handleError(error)
+    } finally {
+      stationDispatch({ type: "SET_LOADING", payload: false })
+    }
+  }, [isRoleAdmin])
+
+  const deleteStation = useCallback(async (stationID: number, employeesAssigned: Employee[]) => {
+    if (!isRoleAdmin()) return
+
+    employeesAssigned.map(employee => {
+      const updatedEmployee: Employee = {
+        ...employee,
+        station_id: null,
+        assigned_station: null
+      }
+      employeeDispatch({ type: "UPDATE_EMPLOYEE", payload: updatedEmployee })
+    })
+
+    try {
+      stationDispatch({ type: "SET_LOADING", payload: true })
+      await api.delete(`/api/stations/${stationID}`)
+      stationDispatch({ type: "REMOVE_STATION", payload: stationID })
+      toast.success("Station is successfully removed.")
+    } catch (error) {
+      handleError(error)
+    } finally {
+      stationDispatch({ type: "SET_LOADING", payload: false })
+    }
+  }, [employeeDispatch, isRoleAdmin])
+
+  const deleteBulkStations = useCallback(async (ids: number[]) => {
     if (!isRoleAdmin()) return
     try {
-      ingridientDispatch({ type: "SET_LOADING", payload: true })
-      const response = await api.delete(`/api/ingridients/bulk`, {
+      stationDispatch({ type: "SET_LOADING", payload: true })
+      const response = await api.delete(`/api/stations/bulk`, {
         data: { ids: ids }
       })
-      ingridientDispatch({ type: "REMOVE_INGRIDIENTS", payload: ids })
+      stationDispatch({ type: "REMOVE_STATIONS", payload: ids })
       toast.success(response.data.message)
     } catch (error) {
       handleError(error)
     } finally {
-      ingridientDispatch({ type: "SET_LOADING", payload: false })
+      stationDispatch({ type: "SET_LOADING", payload: false })
     }
   }, [isRoleAdmin])
 
+  const assignManager = useCallback(async (employeeID: number, stationID: number) => {
+
+    const employeeData = employees.find(employee => employee.id === employeeID)
+    const stationData = stationState.stations.find(station => station.id === stationID)
+
+    if (employeeData && stationData) {
+      if (employeeData.role === UserRole.MANAGER) {
+        const payload = {
+          ...employeeData,
+          station_id: null,
+          birthdate: employeeData.birthdate ? new Date(employeeData.birthdate) : null
+        }
+        await updateEmployee(payload, employeeID)
+        employeeDispatch({ type: "ASSIGN_MANAGER", payload: { id: employeeID, stationData } })
+        stationDispatch({ type: "ASSIGN_MANAGER", payload: { id: stationData.id, employeeID: employeeData.id } })
+      }
+    }    
+  }, [employeeDispatch, employees, stationState.stations, updateEmployee])
+
+  const unAssignManager = useCallback(async (employeeID: number, stationID: number) => {
+    const employeeData = employees.find(employee => employee.id === employeeID)
+    const stationData = stationState.stations.find(station => station.id === stationID)
+
+    if (employeeData && stationData) {
+      if (employeeData.role === UserRole.MANAGER) {
+        const payload: StationFormType = {
+          ...stationData,
+          manager_id: null
+        }
+        await updateStation(stationData.id, payload)
+        employeeDispatch({ type: "UNASSIGN_MANAGER", payload: { id: employeeID, stationID: stationData.id } })
+        stationDispatch({ type: "UNASSIGN_MANAGER", payload: { id: stationData.id } })
+      }
+    }    
+  }, [employeeDispatch, employees, stationState.stations, updateStation])
+
   const value = useMemo(() => ({
-    ...ingridientState,
-    fetchAllIngridientsData,
-    fetchIngridientsData,
-    addIngridient,
-    updateIngridient,
-    deleteIngridient,
-    deleteBulkIngridients,
-    onTabChange
+    ...stationState,
+    fetchAllStationsData,
+    fetchStationsData,
+    addStation,
+    updateStation,
+    deleteStation,
+    deleteBulkStations,
+    onTabChange,
+    assignManager,
+    unAssignManager,
   }), [
-    ingridientState,
-    fetchAllIngridientsData,
-    fetchIngridientsData,
-    addIngridient,
-    updateIngridient,
-    deleteIngridient,
-    deleteBulkIngridients,
-    onTabChange
+    stationState,
+    fetchAllStationsData,
+    fetchStationsData,
+    addStation,
+    updateStation,
+    deleteStation,
+    deleteBulkStations,
+    onTabChange,
+    assignManager,
+    unAssignManager,
   ])
 
   return (
-    <IngridientContext.Provider value={value}>
+    <StationContext.Provider value={value}>
       {children}
-    </IngridientContext.Provider>
+    </StationContext.Provider>
   );
 };

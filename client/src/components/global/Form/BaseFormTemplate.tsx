@@ -25,6 +25,7 @@ interface FormProps<T extends object> extends Omit<BaseFieldProps<T>, 'name' | '
   description: string;
   triggerTitle?: string;
   triggerIcon: Icon
+  submitIcon: Icon
   targetID?: number
   formType: FormType
   children: ReactNode;
@@ -37,7 +38,8 @@ export default function BaseFormTemplate<T extends object>({
   title,
   description,
   triggerTitle = "Add Item",
-  triggerIcon: Icon,
+  triggerIcon: TriggerIcon,
+  triggerIcon: SubmitIcon,
   formType,
   children,
   open: externalOpen,         // NEW
@@ -67,11 +69,11 @@ export default function BaseFormTemplate<T extends object>({
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogTrigger asChild>
         {formType === FormType.ADD ? (
-          <TableActionButton Icon={Icon} title={triggerTitle} type="button" />
+          <TableActionButton Icon={TriggerIcon} title={triggerTitle} type="button" />
         ) : (
           <button type="button" className="flex w-full items-center gap-2 p-2">
           
-            <Icon size={18} stroke={1.5} />
+            <TriggerIcon size={18} stroke={1.5} />
             {triggerTitle}
           </button>
         )}
@@ -92,7 +94,7 @@ export default function BaseFormTemplate<T extends object>({
             <DialogClose asChild>
               <Button variant="outline">Cancel</Button>
             </DialogClose>
-            <FormSubmitPrompt formSubmit={handleSubmit} form={form} triggerTitle={triggerTitle}/>
+            <FormSubmitPrompt submitIcon={SubmitIcon} formSubmit={handleSubmit} form={form} triggerTitle={triggerTitle}/>
           </DialogFooter>
         </form>
       </DialogContent>

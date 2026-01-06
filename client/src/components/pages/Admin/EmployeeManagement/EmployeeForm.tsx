@@ -98,6 +98,7 @@ export default function EmployeeForm({ type, targetID, open, onOpenChange }: Emp
       triggerTitle={type === FormType.ADD ? "Add Employee" : "Edit"}
       triggerIcon={type === FormType.ADD ? IconUserPlus : IconEdit}
       onOpenChange={onOpenChange}
+      submitIcon={IconUserPlus}
       open={open}
       >
       {

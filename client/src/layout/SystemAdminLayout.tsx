@@ -19,7 +19,7 @@ const AppSideBarData: AppSideBar = {
   navMain: [
     {
       title: "Dashboard",
-      url: "/admin",
+      url: "/admin/dashboard",
       icon: IconLayout,
     },
     

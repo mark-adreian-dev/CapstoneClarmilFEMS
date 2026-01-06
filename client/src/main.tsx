@@ -9,6 +9,7 @@ import { Theme } from './types/Theme.ts'
 import { ThemeProvider } from './components/theme-provider.tsx'
 import { EmployeeState } from './context/EmployeeContext/EmployeeState.tsx'
 import { IngridientState } from './context/IngridientsContext/IngridientsState.tsx'
+import { StationState } from './context/StationContext/StationState.tsx'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
@@ -17,10 +18,12 @@ createRoot(document.getElementById('root')!).render(
         <AuthState>
           <EmployeeState>
             <IngridientState>
-              <Toaster richColors position="top-center" />
-              <App />
-            </IngridientState>
-          </EmployeeState>
+              <StationState>
+                <Toaster richColors position="top-center" />
+                <App />
+              </StationState>
+              </IngridientState>
+            </EmployeeState>
         </AuthState> 
       </BrowserRouter>
     </ThemeProvider>

@@ -5,7 +5,7 @@ import { IngridientContext, initialIngridientContextValue } from './IngridientsC
 import { AuthContext } from '../AuthContext/AuthContext';
 import { api } from '@/utils/api';
 import { toast } from 'sonner';
-import type { Ingridient, IngridientFormType, IngridientsCategory } from '@/types/Ingridients';
+import type { Ingridient, IngridientFormType, IngridientsCategory } from '@/types/Ingridient';
 import { UserRole } from '@/types/User';
 import { format } from 'date-fns';
 
@@ -17,7 +17,7 @@ export const IngridientState: React.FC<{ children: React.ReactNode }> = ({
 }) => {
   const { user } = useContext(AuthContext)
   const [ingridientState, ingridientDispatch] = useReducer(IngridientReducer, initialIngridientContextValue);
-  const fetchedRef = useRef(false)
+  const ingridientsFetchedRef = useRef(false)
 
   const isRoleAdmin = useCallback(() => {
     return user?.role === UserRole.ADMIN
@@ -53,8 +53,7 @@ export const IngridientState: React.FC<{ children: React.ReactNode }> = ({
 
   const fetchAllIngridientsData = useCallback(async () => {
     if (!isRoleAdmin()) return
-    if (fetchedRef.current) return
-
+    if (ingridientsFetchedRef.current) return
     try {
       ingridientDispatch({ type: "SET_LOADING", payload: true })
       const ingridientDataResponse = await api.get("/api/ingridients")
@@ -65,7 +64,7 @@ export const IngridientState: React.FC<{ children: React.ReactNode }> = ({
       handleError(error)
     } finally {
       ingridientDispatch({ type: "SET_LOADING", payload: false })
-      fetchedRef.current = true
+      ingridientsFetchedRef.current = true
     }
   }, [isRoleAdmin])
 
@@ -173,7 +172,8 @@ export const IngridientState: React.FC<{ children: React.ReactNode }> = ({
     updateIngridient,
     deleteIngridient,
     deleteBulkIngridients,
-    onTabChange
+    onTabChange,
+    ingridientsFetchedRef
   }), [
     ingridientState,
     fetchAllIngridientsData,
@@ -182,7 +182,8 @@ export const IngridientState: React.FC<{ children: React.ReactNode }> = ({
     updateIngridient,
     deleteIngridient,
     deleteBulkIngridients,
-    onTabChange
+    onTabChange,
+    ingridientsFetchedRef
   ])
 
   return (

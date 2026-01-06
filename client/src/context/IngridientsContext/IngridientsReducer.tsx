@@ -1,5 +1,5 @@
 import type { IngridientsContextType } from "./IngridientsContext";
-import type { Ingridient, IngridientsCategory } from "@/types/Ingridients";
+import type { Ingridient, IngridientsCategory } from "@/types/Ingridient";
 
 
 export type IngridientsAction =

@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { IngridientsCategory, type Ingridient, type IngridientFormType } from '@/types/Ingridients';
-import { createContext } from 'react';
+import { IngridientsCategory, type Ingridient, type IngridientFormType } from '@/types/Ingridient';
+import { createContext, type RefObject } from 'react';
 
 export interface IngridientsContextType {
   ingridients: Ingridient[];
@@ -14,6 +14,7 @@ export interface IngridientsContextType {
   addIngridient: (ingridientDetails: IngridientFormType) => Promise<void>
   updateIngridient: (id: number, ingridientDetails: IngridientFormType) => Promise<void>
   onTabChange: (activeTab: IngridientsCategory | string) => void
+  ingridientsFetchedRef: RefObject<boolean>
 }
 
 export const initialIngridientContextValue: IngridientsContextType = {
@@ -27,7 +28,8 @@ export const initialIngridientContextValue: IngridientsContextType = {
   deleteBulkIngridient: async (_ids: number[]) => { },
   addIngridient: async (_ingridientDetails: IngridientFormType) => { },
   updateIngridient: async (_id: number, _ingridientDetails: IngridientFormType) => { },
-  onTabChange: (_activeTab: IngridientsCategory | string) => { }
+  onTabChange: (_activeTab: IngridientsCategory | string) => { },
+  ingridientsFetchedRef: { current: false }
 }
 
 export const IngridientContext = createContext<IngridientsContextType>(initialIngridientContextValue);

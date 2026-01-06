@@ -3,7 +3,7 @@ import IngridientForm from "@/components/pages/Admin/InventoryManagement/Ingridi
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { FormType } from "@/types/ComponentTypes/Form";
-import type { Ingridient } from "@/types/Ingridients";
+import type { Ingridient } from "@/types/Ingridient";
 import { IconDotsVertical } from "@tabler/icons-react";
 import type { Row } from "@tanstack/react-table";
 import { useState } from "react";

@@ -1,7 +1,8 @@
 import type { User } from "./User"
 
 export interface Employee extends User  {
-  station?: Station
+  assigned_station: Station | null
+  managed_stations: Station[]
 }
 
 export interface Station {

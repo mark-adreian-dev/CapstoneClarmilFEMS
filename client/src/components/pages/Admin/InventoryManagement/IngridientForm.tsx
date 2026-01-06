@@ -12,8 +12,8 @@ import Form from "@/components/global/Form";
 
 import { FormType } from "@/types/ComponentTypes/Form";
 import { IngridientContext } from "@/context/IngridientsContext/IngridientsContext";
-import { addIngredientDefaultValues, formSchema } from "./Form/FormSchema";
-import type { IngridientFormType } from "@/types/Ingridients";
+import { addIngridientDefaultValues, formSchema } from "./Form/FormSchema";
+import type { IngridientFormType } from "@/types/Ingridient";
 import FormNumberInput from "@/components/global/Form/FormFields/FormNumberInput";
 import FormImageInput from "@/components/global/Form/FormFields/FormImageInput";
 
@@ -33,7 +33,7 @@ export default function IngridientForm({ type, targetID, open, onOpenChange }: I
   }, [ingridients, targetID]);
 
   const ingridientDetails = useMemo(() => {
-    if (!targetIngridient) return addIngredientDefaultValues;
+    if (!targetIngridient) return addIngridientDefaultValues;
     return {
       name: targetIngridient.name ?? "",
       type: targetIngridient.type ?? null,
@@ -101,6 +101,7 @@ export default function IngridientForm({ type, targetID, open, onOpenChange }: I
       description={type === FormType.ADD ? addIngridientDescription : editIngridientDesctiption}
       triggerTitle={type === FormType.ADD ? "Add Ingridient" : "Edit"}
       triggerIcon={type === FormType.ADD ? IconPlus : IconEdit}
+      submitIcon={IconPlus}
       open={open}
       onOpenChange={onOpenChange}
       >

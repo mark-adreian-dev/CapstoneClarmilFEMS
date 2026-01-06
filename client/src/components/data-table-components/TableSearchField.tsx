@@ -11,7 +11,7 @@ interface TableSearchFieldProps<TData extends object> {
 
 export default function TableSearchField<TData extends object>({ placeholder, table, searchColumn }: TableSearchFieldProps<TData>) {
   return (
-    <div className="flex items-center min-w-full w-full gap-4 mb-4">
+    <div className="flex items-center w-full max-w-100 gap-4 mb-4">
       <IconSearch />
       <Input
         placeholder={placeholder}

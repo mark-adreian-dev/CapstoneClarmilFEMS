@@ -1,6 +1,6 @@
 import { IngridientContext } from '@/context/IngridientsContext/IngridientsContext'
 import LoadingPage from '@/pages/LoadingPage'
-import { IngridientType } from '@/types/Ingridients'
+import { IngridientType } from '@/types/Ingridient'
 import { useContext } from 'react'
 import { BASE_IMAGE_URL } from '@/utils/api'
 import { format } from 'date-fns'

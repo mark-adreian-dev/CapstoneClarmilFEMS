@@ -1,17 +1,19 @@
 import type { BaseFieldProps } from "@/types/ComponentTypes/CustomFormInput"
 import Dialog from "../../Dialog"
 import { Button } from "@/components/ui/button"
-import { IconUserPlus } from "@tabler/icons-react"
+import { type Icon } from "@tabler/icons-react"
 import type { SyntheticEvent } from "react"
 
 interface FormInputProps<T extends object> extends Omit<BaseFieldProps<T>, 'name' | 'label'> {
   formSubmit: (e?: SyntheticEvent) => Promise<unknown> | unknown
   triggerTitle: string
+  submitIcon: Icon
 }
 
 export default function FormSubmitPrompt<T extends object>({
   form,
   formSubmit,
+  submitIcon: SubmitIcon,
   triggerTitle
 }: FormInputProps<T>) {
   return (
@@ -25,7 +27,7 @@ export default function FormSubmitPrompt<T extends object>({
                 <p>Saving...</p>
                 :
                 <>
-                  <IconUserPlus />
+                  <SubmitIcon />
                   <p>{triggerTitle}</p>
                 </>}
             </Button>

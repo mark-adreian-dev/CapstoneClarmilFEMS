@@ -11,7 +11,8 @@ import SystemAdminLayout from "./layout/SystemAdminLayout"
 import AdminDashboardPage from "./pages/Admin/AdminDashboardPage"
 import AdminUsersPage from "./pages/Admin/AdminUsersPage"
 import AdminIngridientsPage from "./pages/Admin/AdminIngridientsPage"
-import AdminStationPage from "./pages/Admin/AdminStationPage"
+import { AdminStationPage } from "./pages/Admin/AdminStationPage"
+import AdminStationManagementPage from "./pages/Admin/AdminStationManagementPage"
 
 
 function App() {
@@ -58,10 +59,12 @@ function App() {
               <SystemAdminLayout />
             </ProtectedRoute>
           }
-        >
-          <Route index element={<AdminDashboardPage />}/>
+      >
+          <Route index element={<Navigate to={"/admin/dashboard"} />} />
+          <Route path="dashboard" element={<AdminDashboardPage />}/>
           <Route path="users" element={<AdminUsersPage />}/>
-          <Route path="stations" element={<AdminStationPage />}/>
+          <Route path="stations" element={<AdminStationPage />} />
+          <Route path="stations/:id" element={<AdminStationManagementPage />} />
           <Route path="ingridients" element={<AdminIngridientsPage />}/>
           <Route path="report" element={<h1>Reports</h1>}/>
         </Route>

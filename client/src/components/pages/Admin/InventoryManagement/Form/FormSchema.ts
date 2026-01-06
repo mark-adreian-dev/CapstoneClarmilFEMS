@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { IngridientType, type Ingridient } from "@/types/Ingridients";
+import { IngridientType, type IngridientFormType } from "@/types/Ingridient";
 
 export const formSchema = z.object({
   name: z.string().min(1, "Name is required").max(255),
@@ -17,7 +17,7 @@ export const formSchema = z.object({
   description: z.string().min(20, "Description must be atleast 20 characters.").max(1000, "Description is too long"),
 });
 
-export const addIngredientDefaultValues: Partial<Ingridient> = {
+export const addIngridientDefaultValues: IngridientFormType = {
   name: "",
   type: undefined,
   image_path: undefined,

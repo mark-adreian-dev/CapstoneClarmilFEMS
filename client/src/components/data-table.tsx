@@ -120,7 +120,7 @@ export function DataTable<TData extends { id: number | string } & object, K exte
           onTabChange={onTabChange}
         />
       </div>
-      {Object.values(category).map((value) => (
+      {category && Object.values(category).map((value) => (
           activeTab === value &&
           <TabContent
             key={value as string}

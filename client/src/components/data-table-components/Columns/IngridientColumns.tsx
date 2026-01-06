@@ -1,11 +1,11 @@
 import type { ColumnDef } from "@tanstack/react-table"
 import { Checkbox } from "../../ui/checkbox"
 import DragHandle from "../ColumnComponents/DragHandle"
-import type { Ingridient } from "@/types/Ingridients"
+import type { Ingridient } from "@/types/Ingridient"
 import { Badge } from "@/components/ui/badge"
 import { IngridientActions } from "./Actions/IngridientActions"
 export const ingridientColumn: ColumnDef<Ingridient>[] = [
-  
+
   {
     id: "drag",
     header: () => null,

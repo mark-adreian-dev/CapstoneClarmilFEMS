@@ -12,10 +12,10 @@ export interface User {
   address?: string
   contact_number?: string
   plain_password: string
+  station_id: number | null
   created_at: Date
   updated_at: Date
 }
-
 
 export type UserFormType = Omit<Partial<User>, 'birthdate'> & {
   birthdate: Date | null;
